@@ -214,3 +214,67 @@
   font-size: 12px;
   font-weight: 400;
 }
+
+
+.h5p-content {
+  border: 0;
+  background: rgba(8, 72, 146, 0.05);
+  padding: 0 40px;
+}
+
+html.h5p-iframe .h5p-container {
+  overflow: visible;
+}
+
+.h5p-interactive-video {
+  width: calc(100% + 80px);
+  margin-left: -40px;
+}
+
+.h5p-question {
+  background: none;
+}
+
+.h5p-question-introduction {
+  margin: 1em 0;
+}
+
+.h5p-question-content {
+  margin: 1em 0;
+}
+.h5p-joubelui-button:last-child,
+.h5p-question-buttons.h5p-question-visible {
+  margin-left: 0;
+}
+
+.h5p-question-content {
+  clear: both;
+}
+.star-rating h5 {
+  font-size: 25px;
+  color: #515151;
+  font-weight: 500;
+  margin: 0;
+}
+
+.h5p-column-content {
+  margin-bottom: 0px;
+  padding-left: 0;
+}
+
+.h5p-question-introduction {   
+  clear: both;
+  float: left;
+  width: 100%;
+}
+body .h5p-joubelui-button {
+  border: 1px solid #1a73d9;
+  color: #1a73d9;
+  font-size: 14px;
+  font-weight: 500;
+  font-family: inherit;
+  padding: 13px 26px;
+  min-width: 135px;
+  background: none;
+  border-radius: 3px;
+}

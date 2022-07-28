@@ -62,11 +62,11 @@ H5P.MultiChoice = function (options, contentId, contentData) {
 
   // checkbox or radiobutton
   var texttemplate =
-    '<ul class="h5p-answers" role="<%= role %>" aria-labelledby="<%= label %>">' +
+    '<ul class="h5p-answers review-btns" role="<%= role %>" aria-labelledby="<%= label %>">' +
     '  <% for (var i=0; i < answers.length; i++) { %>' +
     '    <li class="h5p-answer" role="<%= answers[i].role %>" tabindex="<%= answers[i].tabindex %>" aria-checked="<%= answers[i].checked %>" data-id="<%= i %>">' +
     '      <div class="h5p-alternative-container">' +
-    '        <span class="h5p-alternative-inner"><%= answers[i].text %></span>' +
+    '        <span class="h5p-alternative-inner emoticon-<%= answers[i].text.replace(/<[^>]*>?/gm, "").trim() %>"><%= answers[i].text %></span>' +
     '      </div>' +
     '      <div class="h5p-clearfix"></div>' +
     '    </li>' +
