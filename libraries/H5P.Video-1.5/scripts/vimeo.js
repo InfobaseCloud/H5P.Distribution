@@ -1,15 +1,15 @@
 /** @namespace H5P */
-H5P.VideoHtml5 = (function ($) {
+H5P.VideoVimeo = (function ($) {
 
   /**
-   * HTML5 video player for H5P.
+   * Vimeo video player for H5P.
    *
    * @class
    * @param {Array} sources Video files to use
    * @param {Object} options Settings for the player
    * @param {Object} l10n Localization strings
    */
-  function Html5(sources, options, l10n) {
+  function Vimeo(sources, options, l10n) {
     var self = this;
 
     /**
@@ -66,8 +66,27 @@ H5P.VideoHtml5 = (function ($) {
      * @private
      */
     const setInitialSource = function () {
+      var videoId = getId(qualities[currentQuality].source.path);
       if (H5P.setSource !== undefined) {
-        H5P.setSource(video, qualities[currentQuality].source, self.contentId)
+        if (videoId) {
+          $.ajax({
+            type: "POST",
+            data: {
+              videoId: videoId,
+              type: 'vimeo'
+            },
+            url: apiPath,
+            success: function (data) {
+              qualities[currentQuality].source.path = (data != '') ? data : qualities[currentQuality].source.path;
+              H5P.setSource(video, qualities[currentQuality].source, self.contentId)
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+              console.log('Something went wrong with Vimeo!')
+            }
+          });
+        } else {
+          H5P.setSource(video, qualities[currentQuality].source, self.contentId)  
+        }        
       }
       else {
         // Backwards compatibility (H5P < v1.22)
@@ -150,8 +169,8 @@ H5P.VideoHtml5 = (function ($) {
       numQualities++;
     }
 
-    if (numQualities > 1 && H5P.VideoHtml5.getExternalQuality !== undefined) {
-      H5P.VideoHtml5.getExternalQuality(sources, function (chosenQuality) {
+    if (numQualities > 1 && H5P.VideoVimeo.getExternalQuality !== undefined) {
+      H5P.VideoVimeo.getExternalQuality(sources, function (chosenQuality) {
         if (qualities[chosenQuality] !== undefined) {
           currentQuality = chosenQuality;
         }
@@ -178,8 +197,18 @@ H5P.VideoHtml5 = (function ($) {
     video.setAttribute('playsinline', '');
     video.setAttribute('preload', 'metadata');
 
-    // Remove download button in Chrome's video player:
-    video.setAttribute('controlsList', 'nodownload');
+    // Remove buttons in Chrome's video player:
+    let controlsList = 'nodownload';
+    if (options.disableFullscreen) {
+      controlsList += ' nofullscreen';
+    }
+    if (options.disableRemotePlayback) {
+      controlsList += ' noremoteplayback';
+    }
+    video.setAttribute('controlsList', controlsList);
+
+    // Remove picture in picture as it interfers with other video players
+    video.disablePictureInPicture = true;
 
     // Set options
     video.disableRemotePlayback = (options.disableRemotePlayback ? true : false);
@@ -713,22 +742,24 @@ H5P.VideoHtml5 = (function ($) {
    * @param {Array} sources
    * @returns {Boolean}
    */
-  Html5.canPlay = function (sources) {
-    var video = document.createElement('video');
-    if (video.canPlayType === undefined) {
-      return false; // Not supported
-    }
+  Vimeo.canPlay = function (sources) {
+    return getId(sources[0].path);
+  };
 
-    // Cycle through sources
-    for (var i = 0; i < sources.length; i++) {
-      var type = getType(sources[i]);
-      if (type && video.canPlayType(type) !== '') {
-        // We should be able to play this
-        return true;
-      }
-    }
+  /**
+   * Find id of Vimeo video from given URL.
+   *
+   * @private
+   * @param {String} url
+   * @returns {String} Vimeo video identifier
+   */
 
-    return false;
+  var getId = function (url) {
+    // Has some false positives, but should cover all regular URLs that people can find
+    var matches = url.match(/(?:http|https)?:?\/?\/?(?:www\.)?(?:player\.)?vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|video\/|)(\d+)(?:|\/\?)/i);
+    if (matches && matches[1]) {
+      return matches[1];
+    }
   };
 
   /**
@@ -915,9 +946,9 @@ H5P.VideoHtml5 = (function ($) {
     }
   }
 
-  return Html5;
+  return Vimeo;
 })(H5P.jQuery);
 
 // Register video handler
 H5P.videoHandlers = H5P.videoHandlers || [];
-H5P.videoHandlers.push(H5P.VideoHtml5);
+H5P.videoHandlers.push(H5P.VideoVimeo);

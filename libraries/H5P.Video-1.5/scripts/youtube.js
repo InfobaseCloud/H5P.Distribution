@@ -293,7 +293,7 @@ H5P.VideoYouTube = (function ($) {
       if (!player || !player.getDuration) {
         return;
       }
-
+      localStorage.setItem('VideoDuration', player.getDuration());
       return player.getDuration();
     };
 
@@ -502,7 +502,41 @@ H5P.VideoYouTube = (function ($) {
     // Has some false positives, but should cover all regular URLs that people can find
     var matches = url.match(/(?:(?:youtube.com\/(?:attribution_link\?(?:\S+))?(?:v\/|embed\/|watch\/|(?:user\/(?:\S+)\/)?watch(?:\S+)v\=))|(?:youtu.be\/|y2u.be\/))([A-Za-z0-9_-]{11})/i);
     if (matches && matches[1]) {
+      localStorage.setItem('VideoThumbnail', `http://img.youtube.com/vi/${matches[1]}/sddefault.jpg`);
       return matches[1];
+    }else{
+      if(url.includes('kaltura')){
+        let parentId = url.split('p/'),
+        parent_id = parentId[1].split('/s');
+        let entryId = url.split('entryId/'),
+        entry_id = entryId[1].split('/format');
+        let requestOptions = {
+          method: 'GET',
+          redirect: 'follow'
+        };
+        fetch(`https://cdnsecakmi.kaltura.com/p/${parent_id[0]}/thumbnail/entry_id/${entry_id[0]}`, requestOptions)
+          .then(response => response.text())
+          .then(result => {
+            console.log('result', result)
+          })
+          .catch(error => console.log('error', error));
+
+
+      }else if(url.includes('vimeo')){
+        let vimeoId = url.split('com/');
+        console.log('vimeoId', vimeoId);
+        let requestOptions = {
+          method: 'GET',
+          redirect: 'follow'
+        };
+        fetch(`http://vimeo.com/api/v2/video/${vimeoId[1]}.json`, requestOptions)
+          .then(response => response.json())
+          .then(result => {
+            localStorage.setItem('VideoDuration', result[0].duration);
+            localStorage.setItem('VideoThumbnail', result[0].thumbnail_medium);
+          })
+          .catch(error => console.log('error', error));
+      }
     }
   };
 
