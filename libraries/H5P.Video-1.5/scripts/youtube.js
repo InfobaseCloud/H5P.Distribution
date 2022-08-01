@@ -498,7 +498,7 @@ H5P.VideoYouTube = (function ($) {
    * @returns {String} YouTube video identifier
    */
 
-  var getId = function (url) {
+   var getId = function (url) {
     // Has some false positives, but should cover all regular URLs that people can find
     var matches = url.match(/(?:(?:youtube.com\/(?:attribution_link\?(?:\S+))?(?:v\/|embed\/|watch\/|(?:user\/(?:\S+)\/)?watch(?:\S+)v\=))|(?:youtu.be\/|y2u.be\/))([A-Za-z0-9_-]{11})/i);
     if (matches && matches[1]) {
@@ -510,18 +510,8 @@ H5P.VideoYouTube = (function ($) {
         parent_id = parentId[1].split('/s');
         let entryId = url.split('entryId/'),
         entry_id = entryId[1].split('/format');
-        let requestOptions = {
-          method: 'GET',
-          redirect: 'follow'
-        };
-        fetch(`https://cdnsecakmi.kaltura.com/p/${parent_id[0]}/thumbnail/entry_id/${entry_id[0]}`, requestOptions)
-          .then(response => response.text())
-          .then(result => {
-            console.log('result', result)
-          })
-          .catch(error => console.log('error', error));
-
-
+        localStorage.setItem('VideoThumbnail', `https://cdnsecakmi.kaltura.com/p/${parent_id[0]}/thumbnail/entry_id/${entry_id[0]}`);
+      
       }else if(url.includes('vimeo')){
         let vimeoId = url.split('com/');
         console.log('vimeoId', vimeoId);
