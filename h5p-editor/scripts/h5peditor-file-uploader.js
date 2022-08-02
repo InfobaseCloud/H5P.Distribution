@@ -48,7 +48,7 @@ H5PEditor.FileUploader = (function ($, EventDispatcher) {
           var success = image.length > 100000;
           if (success) {
               var bearer = 'Bearer ' + localStorage.getItem('auth_token'),
-              url = 'https://dev.currikistudio.org/api/api/v1/activities/upload-thumb';
+              url = 'https://imsparked-curriki.aws.infobase.com/api/api/v1/activities/upload-thumb';
               const base64 = await fetch(image);
               const blob = await base64.blob();
               var dataBinary=(image).split(',')[1];
@@ -63,7 +63,7 @@ H5PEditor.FileUploader = (function ($, EventDispatcher) {
               })
               .then((response) => response.json())
               .then((data) => {
-                localStorage.setItem('VideoThumbnail', `https://dev.currikistudio.org${data.thumbUrl}`);
+                localStorage.setItem('VideoThumbnail', `https://imsparked-curriki.aws.infobase.com${data.thumbUrl}`);
               })
           }
           return success;
