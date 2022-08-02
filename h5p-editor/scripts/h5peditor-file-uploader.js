@@ -20,6 +20,65 @@ H5PEditor.FileUploader = (function ($, EventDispatcher) {
      * @param {string} filename Required due to validation
      */
     self.upload = function (file, filename) {
+      
+      var fileReader = new FileReader();
+      
+      fileReader.onload = function() {
+        var blob = new Blob([fileReader.result], {type: file.type});
+        var url = URL.createObjectURL(blob);
+        var video = document.createElement('video');
+        var timeupdate = function() {
+            if (snapImage()) {
+              video.removeEventListener('timeupdate', timeupdate);
+              video.pause();
+            }
+        };
+        video.addEventListener('loadeddata', function() {
+          localStorage.setItem('VideoDuration', video.duration);
+            if (snapImage()) {
+              video.removeEventListener('timeupdate', timeupdate);
+            }
+        });
+        var snapImage = async function() { 
+          var canvas = document.createElement('canvas');
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+          var image = canvas.toDataURL();
+          var success = image.length > 100000;
+          if (success) {
+              var bearer = 'Bearer ' + localStorage.getItem('auth_token'),
+              url = 'http://localhost:30400/api/v1/activities/upload-thumb';
+              const base64 = await fetch(image);
+              const blob = await base64.blob();
+              var dataBinary=(image).split(',')[1];
+              const formImageData = new FormData();
+              formImageData.append("thumb", blob);
+              fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': bearer,
+                },
+                body: formImageData
+              })
+              .then((response) => response.json())
+              .then((data) => {
+                localStorage.setItem('VideoThumbnail', `http://localhost:30400${data.thumbUrl}`);
+              })
+          }
+          return success;
+        }
+        video.addEventListener('timeupdate', timeupdate);
+        video.preload = 'metadata';
+        video.src = url;
+        // Load video in Safari / IE11
+        video.muted = true;
+        video.playsInline = true;
+        video.play();
+      }
+      fileReader.readAsArrayBuffer(file);
+
+
       var formData = new FormData();
       formData.append('file', file, filename);
       formData.append('field', JSON.stringify(field));
@@ -65,7 +124,6 @@ H5PEditor.FileUploader = (function ($, EventDispatcher) {
         // Allow the widget to process the result
         self.trigger('uploadComplete', uploadComplete);
       };
-
       request.open('POST', H5PEditor.getAjaxUrl('files'), true);
       request.send(formData);
       self.trigger('upload');
