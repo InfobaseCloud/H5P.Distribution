@@ -63,7 +63,7 @@ H5PEditor.FileUploader = (function ($, EventDispatcher) {
               })
               .then((response) => response.json())
               .then((data) => {
-                localStorage.setItem('VideoThumbnail', `https://imsparked-curriki.aws.infobase.com${data.thumbUrl}`);
+                localStorage.setItem('VideoThumbnail', `https://imsparked-curriki.aws.infobase.com/api${data.thumbUrl}`);
               })
           }
           return success;
