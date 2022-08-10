@@ -53,7 +53,7 @@ H5P.ActionBar = (function ($, EventDispatcher) {
         appendTo: $actions
       });
 
-      hasActions = true;
+      hasActions = false;
     };
 
     // Register action bar buttons
@@ -70,7 +70,7 @@ H5P.ActionBar = (function ($, EventDispatcher) {
     if (displayOptions.icon) {
       // Add about H5P button icon
       H5P.jQuery('<li><a class="h5p-link" href="http://h5p.org" target="_blank" title="' + H5P.t('h5pDescription') + '"></a></li>').appendTo($actions);
-      hasActions = true;
+      hasActions = false;
     }
 
     /**
