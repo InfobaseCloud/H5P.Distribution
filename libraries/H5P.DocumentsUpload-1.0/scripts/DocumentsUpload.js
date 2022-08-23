@@ -87,8 +87,10 @@ H5P.DocumentsUpload = (function ($) {
      */
     function isIframeLoaded(ele) {
         try {
-            console.log(ele.contentWindow); // if iframe is loaded this will through exception due to cross-origin policy
-            return false; // if here means exception is not thrown so content is not loaded in iframe
+            ele.contentWindow.onerror = function() {
+                return false;
+            }; // if iframe is loaded this will through exception due to cross-origin policy
+            console.log({ele: ele.contentWindow});// return false; // if here means exception is not thrown so content is not loaded in iframe
         } catch (err) {
             return true;
         }
